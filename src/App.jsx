@@ -7,13 +7,16 @@ import { db } from "./config/firebase.js";
 import { HiOutlineUserCircle } from 'react-icons/hi';
 import { RiEditCircleLine } from 'react-icons/ri';
 import { IoMdTrash } from 'react-icons/io';
+import { TbView360 } from "react-icons/tb";
 import Modal from './components/Modal.jsx';
 import EditModal from './components/EditModal.jsx';
+import ViewModal from './components/ViewModal.jsx';
 
 const App = () => {
   const [contacts, setContacts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
 
   useEffect(() => {
@@ -70,6 +73,11 @@ const App = () => {
     }
   };
 
+  const handleViewContact = (contact) => {
+    setSelectedContact(contact);
+    setShowViewModal(true);
+  };
+
   return (
     <div className='max-w-[370px] mx-auto'>
       <Navbar />
@@ -86,21 +94,27 @@ const App = () => {
         {contacts.map((contact) => (
           <div key={contact.id} className='bg-slate-400 flex justify-between items-center rounded-lg p-2 mt-2'>
             <div className='flex gap-3 items-center'>
-              <HiOutlineUserCircle className='text-4xl' />
-              <div className=''>
-                <h2 className=''>{contact.name}</h2>
-                <p className=''>{contact.phoneNo}</p>
+              {contact.imageUrl ? (
+                <img src={contact.imageUrl} alt={contact.name} className='w-10 h-10 rounded-full object-cover' />
+              ) : (
+                <HiOutlineUserCircle className='text-4xl' />
+              )}
+              <div>
+                <h2>{contact.name}</h2>
+                <p>{contact.phoneNo}</p>
               </div>
             </div>
-            <div className='flex'>
-              <RiEditCircleLine className='text-3xl' onClick={() => handleEditContact(contact)} />
-              <IoMdTrash className='text-3xl' onClick={() => handleDeleteContact(contact.id)} />
+            <div className='flex gap-2'>
+              <RiEditCircleLine className='text-3xl cursor-pointer' onClick={() => handleEditContact(contact)} />
+              <IoMdTrash className='text-3xl cursor-pointer' onClick={() => handleDeleteContact(contact.id)} />
+              <TbView360 className='text-3xl cursor-pointer' onClick={() => handleViewContact(contact)} />
             </div>
           </div>
         ))}
       </div>
       <Modal isVisible={showModal} onClose={() => setShowModal(false)} onAddContact={handleAddContact} />
       <EditModal isVisible={showEditModal} onClose={() => setShowEditModal(false)} contact={selectedContact} onUpdateContact={handleUpdateContact} />
+      <ViewModal isVisible={showViewModal} onClose={() => setShowViewModal(false)} contact={selectedContact} />
     </div>
   );
 };
